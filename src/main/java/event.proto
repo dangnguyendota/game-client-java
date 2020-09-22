@@ -1,0 +1,100 @@
+syntax = "proto3";
+
+package event;
+
+option go_package = ".;event";
+option java_package = "com.ndn.event.stage";
+option java_outer_classname = "StagePacket";
+
+message Packet {
+  string packet_id = 1;
+  oneof message {
+    Error error = 2;
+    CreateRoom create_room = 3;
+    JoinRoom join_room = 4;
+    LeaveRoom leave_room = 5;
+    Room room = 6;
+    Presence presence = 7;
+    JoinLeave join_leave = 8;
+    SearchRoom search_room = 9;
+    JoinCreatedRoom join_created_room = 10;
+    CancelSearchRoom cancel_search_room = 11;
+    Actor actor = 12;
+    QueryRoom query_room = 13;
+  }
+}
+
+message Error {
+  uint32 code = 1;
+  string message = 2;
+}
+
+message Presence {
+  // user id
+  string id = 1;
+  // session id
+  string sid = 6;
+  // display name in game
+  string display_name = 3;
+  // avatar id
+  string avatar = 4;
+}
+
+message Room {
+  string room_id = 1;
+  string game_id = 2;
+  repeated Presence players = 3;
+  repeated Presence viewers = 4;
+  map<string, string> metadata = 5;
+  int64 create_time = 6;
+}
+
+message CreateRoom {
+  string game_id = 1;
+}
+
+message LeaveRoom {
+  string room_id = 1;
+  string game_id = 2;
+}
+
+message JoinRoom {
+  string room_id = 1;
+  string game_id = 2;
+}
+
+message ViewRoom {
+  string room_id = 1;
+  string game_id = 2;
+}
+
+message JoinLeave {
+  string room_id = 1;
+  repeated Presence joins = 2;
+  repeated Presence leaves = 3;
+}
+
+message SearchRoom {
+  string game_id = 1;
+}
+
+message CancelSearchRoom {
+}
+
+message JoinCreatedRoom {
+  string service_id = 1;
+  string game_id = 2;
+  string room_id = 3;
+}
+
+message QueryRoom {
+}
+
+message Actor {
+  string service_id = 1;
+  string game_id = 2;
+  string room_id = 3;
+  string actor_address = 4;
+  int64 actor_port = 5;
+  int64 create_time = 6;
+}
