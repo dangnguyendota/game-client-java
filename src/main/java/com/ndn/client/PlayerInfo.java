@@ -1,8 +1,7 @@
-package com.ndn.gameclient;
+package com.ndn.client;
 
 import com.google.gson.Gson;
 
-import java.sql.Time;
 import java.util.Date;
 import java.util.Map;
 import java.util.UUID;

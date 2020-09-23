@@ -1,9 +1,9 @@
-package com.ndn.gameclient;
+package com.ndn.client;
 
 public class Config {
     String apiVersion;
     String apiAddress;
-    String gsAddress;
+    String stageAddress;
 
     public Config withApiVersion(String version) {
         this.apiVersion = version;
@@ -16,7 +16,7 @@ public class Config {
     }
 
     public Config withGameServerAddress(String address) {
-        this.gsAddress = address;
+        this.stageAddress = address;
         return this;
     }
 
@@ -29,6 +29,6 @@ public class Config {
     }
 
     public String gameServerPath(String token) {
-        return this.gsAddress + "?token=" + token;
+        return this.stageAddress + "?token=" + token;
     }
 }

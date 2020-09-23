@@ -1,8 +1,6 @@
-package com.ndn.gameclient;
+package com.ndn.client;
 
-import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
-import com.ndn.event.stage.StagePacket;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package com.ndn.gameclient;
+package com.ndn.client;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gson.JsonObject;
@@ -25,9 +25,13 @@ public interface Session {
 
     Date authExpiredTime();
 
+    boolean authIsExpired();
+
     Date createTime();
 
     Date updateTime();
+
+    void setListener(SessionListener listener);
 
     JsonObject post(@Nonnull String path, @Nonnull List<NameValuePair> params) throws IOException;
 
@@ -41,7 +45,11 @@ public interface Session {
 
     ListenableFuture<Void> joinRoom(@Nonnull UUID serviceId, @Nonnull String gameId, @Nonnull UUID roomId);
 
-    ListenableFuture<Boolean> connect();
+    ListenableFuture<Actor> queryRoom();
+
+    ListenableFuture<Boolean> connectStage();
+
+    ListenableFuture<Boolean> connectActor(@Nonnull String address, @Nonnull String gameId, @Nonnull String roomId);
 
     void disconnect();
 }

@@ -32,8 +32,6 @@ message Error {
 message Presence {
   // user id
   string id = 1;
-  // session id
-  string sid = 6;
   // display name in game
   string display_name = 3;
   // avatar id

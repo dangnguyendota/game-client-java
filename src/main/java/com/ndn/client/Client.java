@@ -1,10 +1,11 @@
-package com.ndn.gameclient;
+package com.ndn.client;
 
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.ndn.event.actor.ActorPacket;
 import com.ndn.event.stage.StagePacket;
 import com.neovisionaries.ws.client.*;
 import org.apache.commons.io.IOUtils;
@@ -24,11 +25,16 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Client implements Session {
+    public static Session createSession(Config config) {
+        return new Client(config);
+    }
+
     private final Config config;
     private HttpClient client;
     private PlayerInfo info;
-    private ClientListener listener;
-    private WebSocket ws;
+    private SessionListener listener;
+    private WebSocket stageWs;
+    private WebSocket actorWs;
     private PacketManager packetManager;
     private ExecutorService queue;
 
@@ -37,11 +43,12 @@ public class Client implements Session {
         this.client = HttpClients.createDefault();
         packetManager = new PacketManager();
         queue = Executors.newSingleThreadExecutor();
+
     }
 
-    public Client withListener(ClientListener listener) {
+    @Override
+    public void setListener(SessionListener listener) {
         this.listener = listener;
-        return this;
     }
 
 
@@ -102,6 +109,11 @@ public class Client implements Session {
     }
 
     @Override
+    public boolean authIsExpired() {
+        return this.authExpiredTime().getTime() - new Date().getTime() < 0L;
+    }
+
+    @Override
     public Date createTime() {
         return info.createdAt;
     }
@@ -152,30 +164,60 @@ public class Client implements Session {
     }
 
     @Override
-    public ListenableFuture<Boolean> connect() {
+    public ListenableFuture<Boolean> connectStage() {
         try {
             WebSocketFactory factory = new WebSocketFactory().setConnectionTimeout(5000);
-            ws = factory.createSocket(this.config.gameServerPath(this.info.token));
+            stageWs = factory.createSocket(this.config.gameServerPath(this.info.token));
             WebSocketAdapter adapter = new WebSocketAdapter() {
                 @Override
                 public void onBinaryMessage(WebSocket websocket, byte[] binary) {
-                    Client.this.onBinaryMessage(binary);
+                    Client.this.onStageBinaryMessage(binary);
                 }
 
                 @Override
                 public void onConnected(WebSocket websocket, Map<String, List<String>> headers) {
-                    Client.this.listener.onConnected();
+                    Client.this.listener.onStageConnected();
                 }
 
                 @Override
                 public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) {
-                    packetManager.clear();
-                    Client.this.listener.onDisconnected();
+                    Client.this.listener.onStageDisconnected();
                 }
             };
-            ws.addListener(adapter);
-            ws.addExtension(WebSocketExtension.PERMESSAGE_DEFLATE);
-            ws.connect();
+            stageWs.addListener(adapter);
+            stageWs.addExtension(WebSocketExtension.PERMESSAGE_DEFLATE);
+            stageWs.connect();
+            return Futures.immediateFuture(true);
+        } catch (Exception e) {
+            listener.onException(e);
+        }
+        return Futures.immediateFuture(false);
+    }
+
+    @Override
+    public ListenableFuture<Boolean> connectActor(@Nonnull String address, @Nonnull String gameId, @Nonnull String roomId) {
+        try {
+            WebSocketFactory factory = new WebSocketFactory().setConnectionTimeout(5000);
+            actorWs = factory.createSocket("ws://" + address + "/ws?token=" + authToken() + "&game_id=" + gameId + "&room_id=" + roomId);
+            WebSocketAdapter adapter = new WebSocketAdapter() {
+                @Override
+                public void onBinaryMessage(WebSocket websocket, byte[] binary) {
+                    Client.this.onActorBinaryMessage(binary);
+                }
+
+                @Override
+                public void onConnected(WebSocket websocket, Map<String, List<String>> headers) {
+                    Client.this.listener.onActorConnected();
+                }
+
+                @Override
+                public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) {
+                    Client.this.listener.onActorDisconnected();
+                }
+            };
+            actorWs.addListener(adapter);
+            actorWs.addExtension(WebSocketExtension.PERMESSAGE_DEFLATE);
+            actorWs.connect();
             return Futures.immediateFuture(true);
         } catch (Exception e) {
             listener.onException(e);
@@ -185,6 +227,9 @@ public class Client implements Session {
 
     @Override
     public ListenableFuture<Void> searchRoom(@Nonnull String gameId) {
+        if (stageWs == null || !stageWs.isOpen()) {
+            return Futures.immediateFailedFuture(new Exception("websocket is not connected"));
+        }
         StagePacket.SearchRoom searchRoom = StagePacket.SearchRoom.newBuilder().
                 setGameId(gameId).build();
         return sendPacket(StagePacket.Packet.newBuilder().
@@ -193,35 +238,50 @@ public class Client implements Session {
 
     @Override
     public ListenableFuture<Void> cancelSearching() {
+        if (stageWs == null || !stageWs.isOpen()) {
+            return Futures.immediateFailedFuture(new Exception("websocket is not connected"));
+        }
         StagePacket.CancelSearchRoom cancelSearchRoom = StagePacket.CancelSearchRoom.newBuilder().build();
         return sendPacket(StagePacket.Packet.newBuilder().setCancelSearchRoom(cancelSearchRoom));
     }
 
     @Override
     public ListenableFuture<Void> joinRoom(@Nonnull UUID serviceId, @Nonnull String gameId, @Nonnull UUID roomId) {
+        if (stageWs == null || !stageWs.isOpen()) {
+            return Futures.immediateFailedFuture(new Exception("websocket is not connected"));
+        }
         StagePacket.JoinCreatedRoom joinCreatedRoom = StagePacket.JoinCreatedRoom.newBuilder().
                 setServiceId(serviceId.toString()).setGameId(gameId).setRoomId(roomId.toString()).build();
         return sendPacket(StagePacket.Packet.newBuilder().setJoinCreatedRoom(joinCreatedRoom));
     }
 
     @Override
-    public synchronized void disconnect() {
-        packetManager.clear();
-        ws.disconnect();
+    public ListenableFuture<Actor> queryRoom() {
+        if (stageWs == null || !stageWs.isOpen()) {
+            return Futures.immediateFailedFuture(new Exception("websocket is not connected"));
+        }
+        StagePacket.QueryRoom queryRoom = StagePacket.QueryRoom.newBuilder().build();
+        return sendPacket(StagePacket.Packet.newBuilder().setQueryRoom(queryRoom));
     }
 
-    private void onBinaryMessage(byte[] binary) {
+    @Override
+    public synchronized void disconnect() {
+        packetManager.clear();
+        stageWs.disconnect();
+    }
+
+    private void onStageBinaryMessage(byte[] binary) {
         try {
             final StagePacket.Packet packet = StagePacket.Packet.parseFrom(binary);
             if (packet.getPacketId() == null || "".equals(packet.getPacketId())) {
                 // server message
                 queue.execute(() -> {
                     if (packet.hasError()) {
-                        listener.onError(new Error(packet.getError().getCode(), packet.getError().getMessage()));
+                        listener.onStageError(new Error(packet.getError().getCode(), packet.getError().getMessage()));
                     } else {
                         if (packet.hasActor()) {
                             Actor actor = new Actor(packet.getActor());
-                            listener.onJoinedRoom(actor.serviceId, actor.gameId, actor.roomId,
+                            listener.onJoinedRoom(actor.serviceId.toString(), actor.gameId, actor.roomId,
                                     actor.actorAddress + ":" + actor.actorPort, actor.createTime);
                         }
                     }
@@ -237,9 +297,41 @@ public class Client implements Session {
                     future.setException(new GameException(ErrorCode.fromCode(packet.getError().getCode()),
                             packet.getError().getMessage()));
                 } else {
-                    future.set(null);
+                    if(packet.hasActor()) {
+                        future.set(new Actor(packet.getActor()));
+                    } else {
+                        future.set(null);
+                    }
                 }
             }
+        } catch (Exception e) {
+            this.listener.onException(e);
+        }
+    }
+
+    private void onActorBinaryMessage(byte[] binary) {
+        try {
+            final ActorPacket.Packet packet = ActorPacket.Packet.parseFrom(binary);
+            queue.execute(()->{
+                if(packet.hasRoomMessage()) {
+                    ActorPacket.RoomMessage roomMessage = packet.getRoomMessage();
+                    listener.onMessaged(roomMessage.getGameId(), roomMessage.getRoomId(), roomMessage.getData().toByteArray(), new Date(roomMessage.getTime() * 1000L));
+                } else if(packet.hasJoinLeave()) {
+                    ActorPacket.JoinLeave joinLeave = packet.getJoinLeave();
+                    if(joinLeave.getJoinsList() != null) {
+                        // joined actor room
+                        for(ActorPacket.Presence presence : joinLeave.getJoinsList()) {
+                            listener.playerJoined(presence.getId(), presence.getDisplayName(), presence.getAvatar());
+                        }
+                    }
+                    if(joinLeave.getLeavesList() != null) {
+                        // left actor room
+                        for(ActorPacket.Presence presence : joinLeave.getLeavesList()) {
+                            listener.playerJoined(presence.getId(), presence.getDisplayName(), presence.getAvatar());
+                        }
+                    }
+                }
+            });
         } catch (Exception e) {
             this.listener.onException(e);
         }
@@ -250,7 +342,7 @@ public class Client implements Session {
         SettableFuture<T> future = SettableFuture.create();
         this.packetManager.set(id, future);
         builder.setPacketId(id);
-        ws.sendBinary(builder.build().toByteArray());
+        stageWs.sendBinary(builder.build().toByteArray());
         return future;
     }
 }

@@ -1,0 +1,120 @@
+syntax = "proto3";
+
+package event;
+
+option go_package = ".;event";
+option java_package = "com.ndn.event.actor";
+option java_outer_classname = "ActorPacket";
+
+message Packet {
+  string packet_id = 1;
+  oneof message {
+    Error error = 2;
+    CreateRoom create_room = 3;
+    JoinRoom join_room = 4;
+    LeaveRoom leave_room = 5;
+    Room room = 6;
+    Presence presence = 7;
+    JoinLeave join_leave = 8;
+    DataSend data_send = 9;
+    RoomMessage room_message = 10;
+    ViewRoom view_room = 11;
+    RealtimeMessages messages = 12;
+    PlayerPreparingToJoin player_preparing_to_join = 13;
+  }
+}
+
+message Error {
+  uint32 code = 1;
+  string message = 2;
+}
+
+message Presence {
+  // user id
+  string id = 1;
+  // display name in game
+  string display_name = 3;
+  // avatar id
+  string avatar = 4;
+}
+
+message Room {
+  string room_id = 1;
+  string game_id = 2;
+  repeated Presence players = 3;
+  repeated Presence viewers = 4;
+  map<string, string> metadata = 5;
+  int64 create_time = 6;
+}
+
+message CreateRoom {
+  string game_id = 1;
+}
+
+message LeaveRoom {
+  string room_id = 1;
+  string game_id = 2;
+}
+
+message JoinRoom {
+  string room_id = 1;
+  string game_id = 2;
+}
+
+message ViewRoom {
+  string room_id = 1;
+  string game_id = 2;
+}
+
+// server notifies that some players joined or left room
+message JoinLeave {
+  string room_id = 1;
+  repeated Presence joins = 2;
+  repeated Presence leaves = 3;
+}
+
+// client send data to server
+message DataSend {
+  string room_id = 1;
+  // message that the client want to send
+  bytes data = 2;
+  // ids of received players
+  repeated string to = 3;
+  // code of message, if code <= 0, server will automatically send this packet
+  // to targets and not handle it
+  int64 code = 4;
+  // game id
+  string game_id = 5;
+  // self session id
+  string sid = 6;
+}
+
+// server send message to clients proactively
+message RoomMessage {
+  // game id
+  string game_id = 1;
+  // room id
+  string room_id = 2;
+  // message that server want to send
+  bytes data = 3;
+  // time that packet is sent
+  int64 time = 4;
+}
+
+message RealtimeMessage {
+  Presence presence = 1;
+  bytes data = 2;
+  int64 create_time = 3;
+}
+
+message RealtimeMessages {
+  string game_id = 1;
+  string room_id = 2;
+  repeated RealtimeMessage messages = 3;
+}
+
+message PlayerPreparingToJoin {
+  string game_id = 1;
+  string room_id = 2;
+  Presence presence = 3;
+}

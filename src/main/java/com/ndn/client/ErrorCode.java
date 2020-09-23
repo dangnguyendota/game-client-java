@@ -1,4 +1,4 @@
-package com.ndn.gameclient;
+package com.ndn.client;
 
 public enum ErrorCode {
     Unknown,
