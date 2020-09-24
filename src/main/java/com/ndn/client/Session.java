@@ -39,6 +39,14 @@ public interface Session {
 
     ListenableFuture<Boolean> login(String username, String password);
 
+    ListenableFuture<Boolean> connectStage();
+
+    ListenableFuture<Boolean> connectActor(@Nonnull String address, @Nonnull String gameId, @Nonnull String roomId);
+
+    void disconnectStage();
+
+    void disconnectActor();
+
     ListenableFuture<Void> searchRoom(@Nonnull String gameId);
 
     ListenableFuture<Void> cancelSearching();
@@ -47,9 +55,5 @@ public interface Session {
 
     ListenableFuture<Actor> queryRoom();
 
-    ListenableFuture<Boolean> connectStage();
-
-    ListenableFuture<Boolean> connectActor(@Nonnull String address, @Nonnull String gameId, @Nonnull String roomId);
-
-    void disconnect();
+    void sendRoomData(@Nonnull String gameId, @Nonnull String roomId, @Nonnull byte[] data);
 }

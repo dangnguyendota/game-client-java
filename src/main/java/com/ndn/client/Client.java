@@ -5,6 +5,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.protobuf.ByteString;
 import com.ndn.event.actor.ActorPacket;
 import com.ndn.event.stage.StagePacket;
 import com.neovisionaries.ws.client.*;
@@ -30,13 +31,13 @@ public class Client implements Session {
     }
 
     private final Config config;
-    private HttpClient client;
+    private final HttpClient client;
     private PlayerInfo info;
     private SessionListener listener;
     private WebSocket stageWs;
     private WebSocket actorWs;
-    private PacketManager packetManager;
-    private ExecutorService queue;
+    private final PacketManager packetManager;
+    private final ExecutorService queue;
 
     public Client(Config config) {
         this.config = config;
@@ -265,9 +266,28 @@ public class Client implements Session {
     }
 
     @Override
-    public synchronized void disconnect() {
+    public void sendRoomData(@Nonnull String gameId, @Nonnull String roomId, @Nonnull byte[] data) {
+        if(actorWs == null || !actorWs.isOpen()) {
+            listener.onException(new Exception("actor is not connected"));
+            return;
+        }
+
+        ActorPacket.RoomMessage roomMessage = ActorPacket.RoomMessage.newBuilder().
+                setGameId(gameId).setRoomId(roomId).setTime(System.currentTimeMillis() / 1000L).
+                setData(ByteString.copyFrom(data)).build();
+        ActorPacket.Packet packet = ActorPacket.Packet.newBuilder().setRoomMessage(roomMessage).build();
+        actorWs.sendBinary(packet.toByteArray());
+    }
+
+    @Override
+    public synchronized void disconnectStage() {
         packetManager.clear();
         stageWs.disconnect();
+    }
+
+    @Override
+    public synchronized void disconnectActor() {
+        actorWs.disconnect();
     }
 
     private void onStageBinaryMessage(byte[] binary) {
@@ -277,11 +297,11 @@ public class Client implements Session {
                 // server message
                 queue.execute(() -> {
                     if (packet.hasError()) {
-                        listener.onStageError(new Error(packet.getError().getCode(), packet.getError().getMessage()));
+                        listener.onStageError(Error.create(packet.getError()));
                     } else {
                         if (packet.hasActor()) {
                             Actor actor = new Actor(packet.getActor());
-                            listener.onJoinedRoom(actor.serviceId.toString(), actor.gameId, actor.roomId,
+                            listener.onJoinedRoom(actor.serviceId, actor.gameId, actor.roomId,
                                     actor.actorAddress + ":" + actor.actorPort, actor.createTime);
                         }
                     }
@@ -313,9 +333,16 @@ public class Client implements Session {
         try {
             final ActorPacket.Packet packet = ActorPacket.Packet.parseFrom(binary);
             queue.execute(()->{
-                if(packet.hasRoomMessage()) {
+                if(packet.hasMessages()) {
+                    ActorPacket.RealtimeMessages messages = packet.getMessages();
+                    List<ActorPacket.RealtimeMessage> list = messages.getMessagesList();
+                    for(ActorPacket.RealtimeMessage message : list) {
+                        listener.onRelayedMessaged(messages.getGameId(), messages.getRoomId(), message.getPresence().getId(),
+                                message.getData().toByteArray(), message.getCreateTime());
+                    }
+                } else if(packet.hasRoomMessage()) {
                     ActorPacket.RoomMessage roomMessage = packet.getRoomMessage();
-                    listener.onMessaged(roomMessage.getGameId(), roomMessage.getRoomId(), roomMessage.getData().toByteArray(), new Date(roomMessage.getTime() * 1000L));
+                    listener.onRoomMessaged(roomMessage.getGameId(), roomMessage.getRoomId(), roomMessage.getData().toByteArray(), roomMessage.getTime());
                 } else if(packet.hasJoinLeave()) {
                     ActorPacket.JoinLeave joinLeave = packet.getJoinLeave();
                     if(joinLeave.getJoinsList() != null) {
@@ -327,9 +354,11 @@ public class Client implements Session {
                     if(joinLeave.getLeavesList() != null) {
                         // left actor room
                         for(ActorPacket.Presence presence : joinLeave.getLeavesList()) {
-                            listener.playerJoined(presence.getId(), presence.getDisplayName(), presence.getAvatar());
+                            listener.playerLeft(presence.getId(), presence.getDisplayName(), presence.getAvatar());
                         }
                     }
+                } else if(packet.hasError()) {
+                    listener.onActorError(Error.create(packet.getError()));
                 }
             });
         } catch (Exception e) {

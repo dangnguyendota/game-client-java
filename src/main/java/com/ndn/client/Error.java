@@ -1,19 +1,26 @@
 package com.ndn.client;
 
-public class Error {
-    private int code;
-    private String message;
+import com.ndn.event.actor.ActorPacket;
+import com.ndn.event.stage.StagePacket;
 
-    public Error(int code, String message) {
-        this.code = code;
-        this.message = message;
+public interface Error {
+
+    int getCode();
+
+    String getMessage();
+
+    static Error create(StagePacket.Error e) {
+        return create(e.getCode(), e.getMessage());
     }
 
-    public int getCode() {
-        return code;
+    static Error create(ActorPacket.Error e) {
+        return create(e.getCode(), e.getMessage());
     }
 
-    public String getMessage() {
-        return message;
+    static Error create(int code, String message) {
+        GameError err = new GameError();
+        err.code = code;
+        err.message = message;
+        return err;
     }
 }

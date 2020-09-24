@@ -1,30 +1,31 @@
 package com.ndn.client;
 
 import java.util.Date;
-import java.util.UUID;
 
 public interface SessionListener {
-    void onHttpError(int code, String error);
+    void onHttpError(final int code, final String error);
 
     void onStageConnected();
 
     void onStageDisconnected();
 
-    void onStageError(Error e);
+    void onStageError(final Error e);
 
     void onActorConnected();
 
     void onActorDisconnected();
 
-    void onActorError(Error e);
+    void onActorError(final Error e);
 
-    void onException(Exception e);
+    void onException(final Exception e);
 
-    void onJoinedRoom(String serviceId, String gameId, String roomId, String address, Date createTime);
+    void onJoinedRoom(final String serviceId, final String gameId, final String roomId, final String address, final Date createTime);
 
-    void playerJoined(String id, String name, String avatar);
+    void playerJoined(final String id, final String name, final String avatar);
 
-    void playerLeft(String id, String name, String avatar);
+    void playerLeft(final String id, final String name, final String avatar);
 
-    void onMessaged(String gameId, String roomId, byte[] data, Date time);
+    void onRoomMessaged(final String gameId, final String roomId, final byte[] data, final long time);
+
+    void onRelayedMessaged(final String gameId, final String roomId, final String senderId, final byte[] data, final long time);
 }

@@ -3,7 +3,6 @@ package com.ndn.client;
 import com.ndn.event.stage.StagePacket;
 
 import java.util.Date;
-import java.util.UUID;
 
 public class Actor {
     public String serviceId;

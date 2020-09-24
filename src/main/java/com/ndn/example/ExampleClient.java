@@ -46,6 +46,7 @@ public class ExampleClient {
                 System.out.println("1. login");
                 System.out.println("2. search room");
                 System.out.println("3. join actor");
+                System.out.println("4. send data");
                 System.out.print("choose action: ");
                 String chosen = scanner.nextLine();
                 switch (chosen) {
@@ -57,6 +58,9 @@ public class ExampleClient {
                         break;
                     case "3":
                         join();
+                        break;
+                    case "4":
+                        sendData();
                         break;
                     default:
                         break Loop;
@@ -83,6 +87,10 @@ public class ExampleClient {
     }
 
     public void join() throws Exception {
-        session.connectActor(actorAddr, gameId, roomId.toString()).get();
+        session.connectActor(actorAddr, gameId, roomId).get();
+    }
+
+    public void sendData() {
+
     }
 }

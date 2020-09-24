@@ -66,7 +66,12 @@ public class SimpleListener implements SessionListener {
     }
 
     @Override
-    public void onMessaged(String gameId, String roomId, byte[] data, Date time) {
-        System.out.println("messaged gameId: " + gameId + " roomId: " + roomId + " time: " + time.toString());
+    public void onRoomMessaged(String gameId, String roomId, byte[] data, long time) {
+        System.out.println("messaged gameId: " + gameId + " roomId: " + roomId + " time: " + time);
+    }
+
+    @Override
+    public void onRelayedMessaged(String gameId, String roomId, String senderId, byte[] data, long time) {
+
     }
 }
