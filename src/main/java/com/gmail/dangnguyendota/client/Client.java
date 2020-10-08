@@ -12,10 +12,9 @@ import com.google.common.util.concurrent.SettableFuture;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.protobuf.ByteString;
-import com.gmail.event.actor.ActorPacket;
-import com.gmail.event.stage.StagePacket;
 import com.neovisionaries.ws.client.*;
-
+import dangnguyendota.event.actor.ActorPacket;
+import dangnguyendota.event.stage.StagePacket;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -139,7 +138,7 @@ public class Client implements Session {
         if (info == null) {
             return null;
         }
-        return this.authExpiredTime().getTime() - new Date().getTime() < 0L;
+        return Objects.requireNonNull(this.authExpiredTime()).getTime() - new Date().getTime() < 0L;
     }
 
     @Override
