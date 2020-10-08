@@ -1,10 +1,9 @@
-package com.ndn.example;
+package com.gmail.dangnguyendota.example;
 
-import com.ndn.client.Error;
-import com.ndn.client.SessionListener;
-import static com.ndn.example.Colors.*;
+import com.gmail.dangnguyendota.client.Error;
+import com.gmail.dangnguyendota.client.SessionListener;
 import java.util.Date;
-import java.util.UUID;
+import static com.gmail.dangnguyendota.example.Colors.*;
 
 public class SimpleListener implements SessionListener {
     @Override
@@ -72,6 +71,11 @@ public class SimpleListener implements SessionListener {
 
     @Override
     public void onRelayedMessaged(String gameId, String roomId, String senderId, byte[] data, long time) {
+
+    }
+
+    @Override
+    public void onRoomClosed(String gameId, String roomId) {
 
     }
 }

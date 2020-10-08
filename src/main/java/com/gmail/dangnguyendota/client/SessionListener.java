@@ -1,4 +1,4 @@
-package com.ndn.client;
+package com.gmail.dangnguyendota.client;
 
 import java.util.Date;
 
@@ -28,4 +28,6 @@ public interface SessionListener {
     void onRoomMessaged(final String gameId, final String roomId, final byte[] data, final long time);
 
     void onRelayedMessaged(final String gameId, final String roomId, final String senderId, final byte[] data, final long time);
+
+    void onRoomClosed(final String gameId, final String roomId);
 }

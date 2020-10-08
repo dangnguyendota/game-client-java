@@ -1,7 +1,7 @@
-package com.ndn.client;
+package com.gmail.dangnguyendota.client;
 
-import com.ndn.event.actor.ActorPacket;
-import com.ndn.event.stage.StagePacket;
+import com.gmail.event.actor.ActorPacket;
+import com.gmail.event.stage.StagePacket;
 
 public interface Error {
 

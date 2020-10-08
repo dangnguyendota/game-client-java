@@ -1,34 +1,58 @@
-package com.ndn.client;
+package com.gmail.dangnguyendota.client;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gson.JsonObject;
+
 import org.apache.http.NameValuePair;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
+
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 public interface Session {
+    @CheckForNull
+    @CheckReturnValue
     UUID id();
 
+    @CheckForNull
+    @CheckReturnValue
     String username();
 
+    @CheckForNull
+    @CheckReturnValue
     String displayName();
 
+    @CheckForNull
+    @CheckReturnValue
     String avatarCode();
 
+    @CheckForNull
+    @CheckReturnValue
     Object attribute(String key);
 
+    @CheckForNull
+    @CheckReturnValue
     String authToken();
 
+    @CheckForNull
+    @CheckReturnValue
     Date authExpiredTime();
 
-    boolean authIsExpired();
+    @CheckForNull
+    @CheckReturnValue
+    Boolean authIsExpired();
 
+    @CheckForNull
+    @CheckReturnValue
     Date createTime();
 
+    @CheckForNull
+    @CheckReturnValue
     Date updateTime();
 
     void setListener(SessionListener listener);
@@ -37,7 +61,7 @@ public interface Session {
 
     ListenableFuture<Boolean> register(@Nonnull String username, @Nonnull String password, @Nonnull String displayName);
 
-    ListenableFuture<Boolean> login(String username, String password);
+    ListenableFuture<Boolean> login(@Nonnull String username, @Nonnull String password);
 
     ListenableFuture<Boolean> connectStage();
 

@@ -1,4 +1,4 @@
-package com.ndn.client;
+package com.gmail.dangnguyendota.client;
 
 public class GameException extends Throwable {
     private final ErrorCode code;

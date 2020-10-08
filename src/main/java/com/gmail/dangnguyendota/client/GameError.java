@@ -1,4 +1,4 @@
-package com.ndn.client;
+package com.gmail.dangnguyendota.client;
 
 public class GameError implements Error {
     protected int code;

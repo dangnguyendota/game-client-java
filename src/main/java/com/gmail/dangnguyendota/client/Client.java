@@ -1,25 +1,28 @@
-package com.ndn.client;
+package com.gmail.dangnguyendota.client;
 
+import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestFactory;
+import com.google.api.client.http.HttpResponse;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.protobuf.ByteString;
-import com.ndn.event.actor.ActorPacket;
-import com.ndn.event.stage.StagePacket;
+import com.gmail.event.actor.ActorPacket;
+import com.gmail.event.stage.StagePacket;
 import com.neovisionaries.ws.client.*;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.*;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 
+import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -31,7 +34,7 @@ public class Client implements Session {
     }
 
     private final Config config;
-    private final HttpClient client;
+    private final HttpRequestFactory client;
     private PlayerInfo info;
     private SessionListener listener;
     private WebSocket stageWs;
@@ -41,7 +44,8 @@ public class Client implements Session {
 
     public Client(Config config) {
         this.config = config;
-        this.client = HttpClients.createDefault();
+        HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
+        this.client = HTTP_TRANSPORT.createRequestFactory();
         packetManager = new PacketManager();
         queue = Executors.newSingleThreadExecutor();
 
@@ -55,18 +59,18 @@ public class Client implements Session {
 
     @Override
     public JsonObject post(@Nonnull String path, @Nonnull List<NameValuePair> params) throws IOException {
-        HttpPost post = new HttpPost(path);
-        post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-        HttpResponse response = client.execute(post);
-        HttpEntity entity = response.getEntity();
-        if (entity == null) {
-            return null;
+        GenericUrl url = new GenericUrl(path);
+        for(NameValuePair pair : params) {
+            url.set(pair.getName(), pair.getValue());
         }
-        try (InputStream stream = entity.getContent()) {
-            JsonObject res = JsonParser.parseString(IOUtils.toString(stream, StandardCharsets.UTF_8)).getAsJsonObject();
-            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND) {
+        HttpRequest httpRequest = this.client.buildPostRequest(url, null);
+        HttpResponse response = httpRequest.execute();
+        try (InputStream stream = response.getContent()) {
+            InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
+            JsonObject res = JsonParser.parseReader(reader).getAsJsonObject();
+            if (response.getStatusCode() == HttpStatus.SC_NOT_FOUND) {
                 this.listener.onHttpError(res.get("code").getAsInt(), res.get("error").getAsString());
-            } else if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+            } else if (response.getStatusCode() == HttpStatus.SC_OK) {
                 return res.get("response").getAsJsonObject();
             }
         }
@@ -76,46 +80,73 @@ public class Client implements Session {
 
     @Override
     public UUID id() {
+        if (info == null) {
+            return null;
+        }
         return info.id;
     }
 
     @Override
     public String username() {
+        if (info == null) {
+            return null;
+        }
         return info.username;
     }
 
     @Override
     public String displayName() {
+        if (info == null) {
+            return null;
+        }
         return info.displayName;
     }
 
     @Override
     public String avatarCode() {
+        if (info == null) {
+            return null;
+        }
         return info.avatar;
     }
 
     @Override
     public Object attribute(String key) {
+        if (info == null) {
+            return null;
+        }
         return info.attributes.get(key);
     }
 
     @Override
     public String authToken() {
+        if (info == null) {
+            return null;
+        }
         return info.token;
     }
 
     @Override
     public Date authExpiredTime() {
+        if (info == null) {
+            return null;
+        }
         return info.tokenExpiredTime;
     }
 
     @Override
-    public boolean authIsExpired() {
+    public Boolean authIsExpired() {
+        if (info == null) {
+            return null;
+        }
         return this.authExpiredTime().getTime() - new Date().getTime() < 0L;
     }
 
     @Override
     public Date createTime() {
+        if(info == null) {
+            return null;
+        }
         return info.createdAt;
     }
 
@@ -125,7 +156,7 @@ public class Client implements Session {
     }
 
     @Override
-    public ListenableFuture<Boolean> login(String username, String password) {
+    public ListenableFuture<Boolean> login(@Nonnull String username, @Nonnull String password) {
         try {
             List<NameValuePair> params = new ArrayList<>(2);
             params.add(new BasicNameValuePair("username", username));
@@ -282,11 +313,17 @@ public class Client implements Session {
     @Override
     public synchronized void disconnectStage() {
         packetManager.clear();
+        if (stageWs == null || !stageWs.isOpen()) {
+            return;
+        }
         stageWs.disconnect();
     }
 
     @Override
     public synchronized void disconnectActor() {
+        if (actorWs == null || !actorWs.isOpen()) {
+            return;
+        }
         actorWs.disconnect();
     }
 
@@ -337,7 +374,7 @@ public class Client implements Session {
                     ActorPacket.RealtimeMessages messages = packet.getMessages();
                     List<ActorPacket.RealtimeMessage> list = messages.getMessagesList();
                     for(ActorPacket.RealtimeMessage message : list) {
-                        listener.onRelayedMessaged(messages.getGameId(), messages.getRoomId(), message.getPresence().getId(),
+                        listener.onRelayedMessaged(messages.getGameId(), messages.getRoomId(), message.getPresenceId(),
                                 message.getData().toByteArray(), message.getCreateTime());
                     }
                 } else if(packet.hasRoomMessage()) {
@@ -357,7 +394,10 @@ public class Client implements Session {
                             listener.playerLeft(presence.getId(), presence.getDisplayName(), presence.getAvatar());
                         }
                     }
-                } else if(packet.hasError()) {
+                } else if(packet.hasClosedRoom()) {
+                    listener.onRoomClosed(packet.getClosedRoom().getGameId(), packet.getClosedRoom().getRoomId());
+                }
+                else if(packet.hasError()) {
                     listener.onActorError(Error.create(packet.getError()));
                 }
             });

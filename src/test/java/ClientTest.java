@@ -1,5 +1,5 @@
-import com.ndn.client.*;
-import com.ndn.example.ExampleClient;
+import com.gmail.dangnguyendota.client.Config;
+import com.gmail.dangnguyendota.example.ExampleClient;
 
 public class ClientTest {
 

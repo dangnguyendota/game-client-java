@@ -1,6 +1,6 @@
-package com.ndn.client;
+package com.gmail.dangnguyendota.client;
 
-import com.ndn.event.stage.StagePacket;
+import com.gmail.event.stage.StagePacket;
 
 import java.util.Date;
 

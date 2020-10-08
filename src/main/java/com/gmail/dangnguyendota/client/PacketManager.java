@@ -1,4 +1,4 @@
-package com.ndn.client;
+package com.gmail.dangnguyendota.client;
 
 import com.google.common.util.concurrent.SettableFuture;
 

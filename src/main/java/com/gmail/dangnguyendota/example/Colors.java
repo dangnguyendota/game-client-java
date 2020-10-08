@@ -1,4 +1,4 @@
-package com.ndn.example;
+package com.gmail.dangnguyendota.example;
 
 public class Colors {
     public static final String ANSI_RESET = "\u001B[0m";

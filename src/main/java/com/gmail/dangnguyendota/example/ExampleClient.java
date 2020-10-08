@@ -1,17 +1,13 @@
-package com.ndn.example;
+package com.gmail.dangnguyendota.example;
 
-import com.ndn.client.Client;
-import com.ndn.client.Config;
-import com.ndn.client.Session;
-import com.ndn.client.SessionListener;
+import com.gmail.dangnguyendota.client.Client;
+import com.gmail.dangnguyendota.client.Config;
+import com.gmail.dangnguyendota.client.Session;
+import com.gmail.dangnguyendota.client.SessionListener;
 
 import java.util.Date;
 import java.util.Scanner;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-
-import static com.ndn.example.Colors.ANSI_BLUE;
-import static com.ndn.example.Colors.ANSI_RESET;
 
 public class ExampleClient {
     private Scanner scanner;
