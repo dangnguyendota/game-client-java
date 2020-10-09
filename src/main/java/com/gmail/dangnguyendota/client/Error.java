@@ -3,24 +3,31 @@ package com.gmail.dangnguyendota.client;
 import dangnguyendota.event.actor.ActorPacket;
 import dangnguyendota.event.stage.StagePacket;
 
-public interface Error {
+public class Error {
+    protected int code;
+    protected String message;
 
-    int getCode();
-
-    String getMessage();
-
-    static Error create(StagePacket.Error e) {
-        return create(e.getCode(), e.getMessage());
+    public Error(int code, String message) {
+        this.code = code;
+        this.message = message;
     }
 
-    static Error create(ActorPacket.Error e) {
-        return create(e.getCode(), e.getMessage());
+    public Error(StagePacket.Error e) {
+        this.code = e.getCode();
+        this.message = e.getMessage();
     }
 
-    static Error create(int code, String message) {
-        GameError err = new GameError();
-        err.code = code;
-        err.message = message;
-        return err;
+    public Error(ActorPacket.Error e) {
+        this.code = e.getCode();
+        this.message = e.getMessage();
     }
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
 }

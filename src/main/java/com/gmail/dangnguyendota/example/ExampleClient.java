@@ -18,7 +18,7 @@ public class ExampleClient {
     public ExampleClient(Config config) {
         scanner = new Scanner(System.in);
 
-        session = Client.createSession(config);
+        session = new Client(config);
         SessionListener listener = new SimpleListener() {
             private UUID serviceId;
             private String gameId;

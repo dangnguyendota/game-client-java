@@ -18,6 +18,7 @@ import dangnguyendota.event.stage.StagePacket;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,10 +29,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Client implements Session {
-    public static Session createSession(Config config) {
-        return new Client(config);
-    }
-
     private final Config config;
     private final HttpRequestFactory client;
     private PlayerInfo info;
@@ -59,7 +56,7 @@ public class Client implements Session {
     @Override
     public JsonObject post(@Nonnull String path, @Nonnull List<NameValuePair> params) throws IOException {
         GenericUrl url = new GenericUrl(path);
-        for(NameValuePair pair : params) {
+        for (NameValuePair pair : params) {
             url.set(pair.getName(), pair.getValue());
         }
         HttpRequest httpRequest = this.client.buildPostRequest(url, null);
@@ -143,7 +140,7 @@ public class Client implements Session {
 
     @Override
     public Date createTime() {
-        if(info == null) {
+        if (info == null) {
             return null;
         }
         return info.createdAt;
@@ -297,7 +294,7 @@ public class Client implements Session {
 
     @Override
     public void sendRoomData(@Nonnull String gameId, @Nonnull String roomId, @Nonnull byte[] data) {
-        if(actorWs == null || !actorWs.isOpen()) {
+        if (actorWs == null || !actorWs.isOpen()) {
             listener.onException(new Exception("actor is not connected"));
             return;
         }
@@ -333,7 +330,7 @@ public class Client implements Session {
                 // server message
                 queue.execute(() -> {
                     if (packet.hasError()) {
-                        listener.onStageError(Error.create(packet.getError()));
+                        listener.onStageError(new Error(packet.getError()));
                     } else {
                         if (packet.hasActor()) {
                             Actor actor = new Actor(packet.getActor());
@@ -350,10 +347,10 @@ public class Client implements Session {
                 }
 
                 if (packet.hasError()) {
-                    future.setException(new GameException(ErrorCode.fromCode(packet.getError().getCode()),
+                    future.setException(new GameException(ErrorCode.Unknown,
                             packet.getError().getMessage()));
                 } else {
-                    if(packet.hasActor()) {
+                    if (packet.hasActor()) {
                         future.set(new Actor(packet.getActor()));
                     } else {
                         future.set(null);
@@ -368,36 +365,35 @@ public class Client implements Session {
     private void onActorBinaryMessage(byte[] binary) {
         try {
             final ActorPacket.Packet packet = ActorPacket.Packet.parseFrom(binary);
-            queue.execute(()->{
-                if(packet.hasMessages()) {
+            queue.execute(() -> {
+                if (packet.hasMessages()) {
                     ActorPacket.RealtimeMessages messages = packet.getMessages();
                     List<ActorPacket.RealtimeMessage> list = messages.getMessagesList();
-                    for(ActorPacket.RealtimeMessage message : list) {
+                    for (ActorPacket.RealtimeMessage message : list) {
                         listener.onRelayedMessaged(messages.getGameId(), messages.getRoomId(), message.getPresenceId(),
                                 message.getData().toByteArray(), message.getCreateTime());
                     }
-                } else if(packet.hasRoomMessage()) {
+                } else if (packet.hasRoomMessage()) {
                     ActorPacket.RoomMessage roomMessage = packet.getRoomMessage();
                     listener.onRoomMessaged(roomMessage.getGameId(), roomMessage.getRoomId(), roomMessage.getData().toByteArray(), roomMessage.getTime());
-                } else if(packet.hasJoinLeave()) {
+                } else if (packet.hasJoinLeave()) {
                     ActorPacket.JoinLeave joinLeave = packet.getJoinLeave();
-                    if(joinLeave.getJoinsList() != null) {
+                    if (joinLeave.getJoinsList() != null) {
                         // joined actor room
-                        for(ActorPacket.Presence presence : joinLeave.getJoinsList()) {
+                        for (ActorPacket.Presence presence : joinLeave.getJoinsList()) {
                             listener.playerJoined(presence.getId(), presence.getDisplayName(), presence.getAvatar());
                         }
                     }
-                    if(joinLeave.getLeavesList() != null) {
+                    if (joinLeave.getLeavesList() != null) {
                         // left actor room
-                        for(ActorPacket.Presence presence : joinLeave.getLeavesList()) {
+                        for (ActorPacket.Presence presence : joinLeave.getLeavesList()) {
                             listener.playerLeft(presence.getId(), presence.getDisplayName(), presence.getAvatar());
                         }
                     }
-                } else if(packet.hasClosedRoom()) {
+                } else if (packet.hasClosedRoom()) {
                     listener.onRoomClosed(packet.getClosedRoom().getGameId(), packet.getClosedRoom().getRoomId());
-                }
-                else if(packet.hasError()) {
-                    listener.onActorError(Error.create(packet.getError()));
+                } else if (packet.hasError()) {
+                    listener.onActorError(new Error(packet.getError()));
                 }
             });
         } catch (Exception e) {
