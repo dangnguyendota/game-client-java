@@ -17,51 +17,9 @@ import java.util.UUID;
 public interface Session {
     @CheckForNull
     @CheckReturnValue
-    UUID id();
-
-    @CheckForNull
-    @CheckReturnValue
-    String username();
-
-    @CheckForNull
-    @CheckReturnValue
-    String displayName();
-
-    @CheckForNull
-    @CheckReturnValue
-    String avatarCode();
-
-    @CheckForNull
-    @CheckReturnValue
-    Object attribute(String key);
-
-    @CheckForNull
-    @CheckReturnValue
     String authToken();
 
-    @CheckForNull
-    @CheckReturnValue
-    Date authExpiredTime();
-
-    @CheckForNull
-    @CheckReturnValue
-    Boolean authIsExpired();
-
-    @CheckForNull
-    @CheckReturnValue
-    Date createTime();
-
-    @CheckForNull
-    @CheckReturnValue
-    Date updateTime();
-
     void setListener(SessionListener listener);
-
-    JsonObject post(@Nonnull String path, @Nonnull List<NameValuePair> params) throws IOException;
-
-    ListenableFuture<Boolean> register(@Nonnull String username, @Nonnull String password, @Nonnull String displayName);
-
-    ListenableFuture<Boolean> login(@Nonnull String username, @Nonnull String password);
 
     ListenableFuture<Boolean> connectStage();
 

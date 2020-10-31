@@ -42,6 +42,19 @@ public final class ActorPacket {
     dangnguyendota.event.actor.ActorPacket.ErrorOrBuilder getErrorOrBuilder();
 
     /**
+     * <code>.event.actor.RoomError room_error = 201;</code>
+     */
+    boolean hasRoomError();
+    /**
+     * <code>.event.actor.RoomError room_error = 201;</code>
+     */
+    dangnguyendota.event.actor.ActorPacket.RoomError getRoomError();
+    /**
+     * <code>.event.actor.RoomError room_error = 201;</code>
+     */
+    dangnguyendota.event.actor.ActorPacket.RoomErrorOrBuilder getRoomErrorOrBuilder();
+
+    /**
      * <code>.event.actor.CreateRoom create_room = 3;</code>
      */
     boolean hasCreateRoom();
@@ -427,6 +440,20 @@ public final class ActorPacket {
               messageCase_ = 14;
               break;
             }
+            case 1610: {
+              dangnguyendota.event.actor.ActorPacket.RoomError.Builder subBuilder = null;
+              if (messageCase_ == 201) {
+                subBuilder = ((dangnguyendota.event.actor.ActorPacket.RoomError) message_).toBuilder();
+              }
+              message_ =
+                  input.readMessage(dangnguyendota.event.actor.ActorPacket.RoomError.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((dangnguyendota.event.actor.ActorPacket.RoomError) message_);
+                message_ = subBuilder.buildPartial();
+              }
+              messageCase_ = 201;
+              break;
+            }
             default: {
               if (!parseUnknownFieldProto3(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -464,6 +491,7 @@ public final class ActorPacket {
     public enum MessageCase
         implements com.google.protobuf.Internal.EnumLite {
       ERROR(2),
+      ROOM_ERROR(201),
       CREATE_ROOM(3),
       JOIN_ROOM(4),
       LEAVE_ROOM(5),
@@ -492,6 +520,7 @@ public final class ActorPacket {
       public static MessageCase forNumber(int value) {
         switch (value) {
           case 2: return ERROR;
+          case 201: return ROOM_ERROR;
           case 3: return CREATE_ROOM;
           case 4: return JOIN_ROOM;
           case 5: return LEAVE_ROOM;
@@ -577,6 +606,32 @@ public final class ActorPacket {
          return (dangnguyendota.event.actor.ActorPacket.Error) message_;
       }
       return dangnguyendota.event.actor.ActorPacket.Error.getDefaultInstance();
+    }
+
+    public static final int ROOM_ERROR_FIELD_NUMBER = 201;
+    /**
+     * <code>.event.actor.RoomError room_error = 201;</code>
+     */
+    public boolean hasRoomError() {
+      return messageCase_ == 201;
+    }
+    /**
+     * <code>.event.actor.RoomError room_error = 201;</code>
+     */
+    public dangnguyendota.event.actor.ActorPacket.RoomError getRoomError() {
+      if (messageCase_ == 201) {
+         return (dangnguyendota.event.actor.ActorPacket.RoomError) message_;
+      }
+      return dangnguyendota.event.actor.ActorPacket.RoomError.getDefaultInstance();
+    }
+    /**
+     * <code>.event.actor.RoomError room_error = 201;</code>
+     */
+    public dangnguyendota.event.actor.ActorPacket.RoomErrorOrBuilder getRoomErrorOrBuilder() {
+      if (messageCase_ == 201) {
+         return (dangnguyendota.event.actor.ActorPacket.RoomError) message_;
+      }
+      return dangnguyendota.event.actor.ActorPacket.RoomError.getDefaultInstance();
     }
 
     public static final int CREATE_ROOM_FIELD_NUMBER = 3;
@@ -947,6 +1002,9 @@ public final class ActorPacket {
       if (messageCase_ == 14) {
         output.writeMessage(14, (dangnguyendota.event.actor.ActorPacket.ClosedRoom) message_);
       }
+      if (messageCase_ == 201) {
+        output.writeMessage(201, (dangnguyendota.event.actor.ActorPacket.RoomError) message_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -1011,6 +1069,10 @@ public final class ActorPacket {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(14, (dangnguyendota.event.actor.ActorPacket.ClosedRoom) message_);
       }
+      if (messageCase_ == 201) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(201, (dangnguyendota.event.actor.ActorPacket.RoomError) message_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -1036,6 +1098,10 @@ public final class ActorPacket {
         case 2:
           result = result && getError()
               .equals(other.getError());
+          break;
+        case 201:
+          result = result && getRoomError()
+              .equals(other.getRoomError());
           break;
         case 3:
           result = result && getCreateRoom()
@@ -1105,6 +1171,10 @@ public final class ActorPacket {
         case 2:
           hash = (37 * hash) + ERROR_FIELD_NUMBER;
           hash = (53 * hash) + getError().hashCode();
+          break;
+        case 201:
+          hash = (37 * hash) + ROOM_ERROR_FIELD_NUMBER;
+          hash = (53 * hash) + getRoomError().hashCode();
           break;
         case 3:
           hash = (37 * hash) + CREATE_ROOM_FIELD_NUMBER;
@@ -1328,6 +1398,13 @@ public final class ActorPacket {
             result.message_ = errorBuilder_.build();
           }
         }
+        if (messageCase_ == 201) {
+          if (roomErrorBuilder_ == null) {
+            result.message_ = message_;
+          } else {
+            result.message_ = roomErrorBuilder_.build();
+          }
+        }
         if (messageCase_ == 3) {
           if (createRoomBuilder_ == null) {
             result.message_ = message_;
@@ -1468,6 +1545,10 @@ public final class ActorPacket {
         switch (other.getMessageCase()) {
           case ERROR: {
             mergeError(other.getError());
+            break;
+          }
+          case ROOM_ERROR: {
+            mergeRoomError(other.getRoomError());
             break;
           }
           case CREATE_ROOM: {
@@ -1769,6 +1850,142 @@ public final class ActorPacket {
         messageCase_ = 2;
         onChanged();;
         return errorBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          dangnguyendota.event.actor.ActorPacket.RoomError, dangnguyendota.event.actor.ActorPacket.RoomError.Builder, dangnguyendota.event.actor.ActorPacket.RoomErrorOrBuilder> roomErrorBuilder_;
+      /**
+       * <code>.event.actor.RoomError room_error = 201;</code>
+       */
+      public boolean hasRoomError() {
+        return messageCase_ == 201;
+      }
+      /**
+       * <code>.event.actor.RoomError room_error = 201;</code>
+       */
+      public dangnguyendota.event.actor.ActorPacket.RoomError getRoomError() {
+        if (roomErrorBuilder_ == null) {
+          if (messageCase_ == 201) {
+            return (dangnguyendota.event.actor.ActorPacket.RoomError) message_;
+          }
+          return dangnguyendota.event.actor.ActorPacket.RoomError.getDefaultInstance();
+        } else {
+          if (messageCase_ == 201) {
+            return roomErrorBuilder_.getMessage();
+          }
+          return dangnguyendota.event.actor.ActorPacket.RoomError.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.event.actor.RoomError room_error = 201;</code>
+       */
+      public Builder setRoomError(dangnguyendota.event.actor.ActorPacket.RoomError value) {
+        if (roomErrorBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          message_ = value;
+          onChanged();
+        } else {
+          roomErrorBuilder_.setMessage(value);
+        }
+        messageCase_ = 201;
+        return this;
+      }
+      /**
+       * <code>.event.actor.RoomError room_error = 201;</code>
+       */
+      public Builder setRoomError(
+          dangnguyendota.event.actor.ActorPacket.RoomError.Builder builderForValue) {
+        if (roomErrorBuilder_ == null) {
+          message_ = builderForValue.build();
+          onChanged();
+        } else {
+          roomErrorBuilder_.setMessage(builderForValue.build());
+        }
+        messageCase_ = 201;
+        return this;
+      }
+      /**
+       * <code>.event.actor.RoomError room_error = 201;</code>
+       */
+      public Builder mergeRoomError(dangnguyendota.event.actor.ActorPacket.RoomError value) {
+        if (roomErrorBuilder_ == null) {
+          if (messageCase_ == 201 &&
+              message_ != dangnguyendota.event.actor.ActorPacket.RoomError.getDefaultInstance()) {
+            message_ = dangnguyendota.event.actor.ActorPacket.RoomError.newBuilder((dangnguyendota.event.actor.ActorPacket.RoomError) message_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            message_ = value;
+          }
+          onChanged();
+        } else {
+          if (messageCase_ == 201) {
+            roomErrorBuilder_.mergeFrom(value);
+          }
+          roomErrorBuilder_.setMessage(value);
+        }
+        messageCase_ = 201;
+        return this;
+      }
+      /**
+       * <code>.event.actor.RoomError room_error = 201;</code>
+       */
+      public Builder clearRoomError() {
+        if (roomErrorBuilder_ == null) {
+          if (messageCase_ == 201) {
+            messageCase_ = 0;
+            message_ = null;
+            onChanged();
+          }
+        } else {
+          if (messageCase_ == 201) {
+            messageCase_ = 0;
+            message_ = null;
+          }
+          roomErrorBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>.event.actor.RoomError room_error = 201;</code>
+       */
+      public dangnguyendota.event.actor.ActorPacket.RoomError.Builder getRoomErrorBuilder() {
+        return getRoomErrorFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.event.actor.RoomError room_error = 201;</code>
+       */
+      public dangnguyendota.event.actor.ActorPacket.RoomErrorOrBuilder getRoomErrorOrBuilder() {
+        if ((messageCase_ == 201) && (roomErrorBuilder_ != null)) {
+          return roomErrorBuilder_.getMessageOrBuilder();
+        } else {
+          if (messageCase_ == 201) {
+            return (dangnguyendota.event.actor.ActorPacket.RoomError) message_;
+          }
+          return dangnguyendota.event.actor.ActorPacket.RoomError.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.event.actor.RoomError room_error = 201;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          dangnguyendota.event.actor.ActorPacket.RoomError, dangnguyendota.event.actor.ActorPacket.RoomError.Builder, dangnguyendota.event.actor.ActorPacket.RoomErrorOrBuilder> 
+          getRoomErrorFieldBuilder() {
+        if (roomErrorBuilder_ == null) {
+          if (!(messageCase_ == 201)) {
+            message_ = dangnguyendota.event.actor.ActorPacket.RoomError.getDefaultInstance();
+          }
+          roomErrorBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              dangnguyendota.event.actor.ActorPacket.RoomError, dangnguyendota.event.actor.ActorPacket.RoomError.Builder, dangnguyendota.event.actor.ActorPacket.RoomErrorOrBuilder>(
+                  (dangnguyendota.event.actor.ActorPacket.RoomError) message_,
+                  getParentForChildren(),
+                  isClean());
+          message_ = null;
+        }
+        messageCase_ = 201;
+        onChanged();;
+        return roomErrorBuilder_;
       }
 
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -4063,6 +4280,893 @@ public final class ActorPacket {
 
     @java.lang.Override
     public dangnguyendota.event.actor.ActorPacket.Error getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface RoomErrorOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:event.actor.RoomError)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string room_id = 1;</code>
+     */
+    java.lang.String getRoomId();
+    /**
+     * <code>string room_id = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getRoomIdBytes();
+
+    /**
+     * <code>string game_id = 2;</code>
+     */
+    java.lang.String getGameId();
+    /**
+     * <code>string game_id = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getGameIdBytes();
+
+    /**
+     * <code>uint32 code = 3;</code>
+     */
+    int getCode();
+
+    /**
+     * <code>string message = 4;</code>
+     */
+    java.lang.String getMessage();
+    /**
+     * <code>string message = 4;</code>
+     */
+    com.google.protobuf.ByteString
+        getMessageBytes();
+  }
+  /**
+   * Protobuf type {@code event.actor.RoomError}
+   */
+  public  static final class RoomError extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:event.actor.RoomError)
+      RoomErrorOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use RoomError.newBuilder() to construct.
+    private RoomError(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private RoomError() {
+      roomId_ = "";
+      gameId_ = "";
+      code_ = 0;
+      message_ = "";
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private RoomError(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              roomId_ = s;
+              break;
+            }
+            case 18: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              gameId_ = s;
+              break;
+            }
+            case 24: {
+
+              code_ = input.readUInt32();
+              break;
+            }
+            case 34: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              message_ = s;
+              break;
+            }
+            default: {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return dangnguyendota.event.actor.ActorPacket.internal_static_event_actor_RoomError_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return dangnguyendota.event.actor.ActorPacket.internal_static_event_actor_RoomError_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              dangnguyendota.event.actor.ActorPacket.RoomError.class, dangnguyendota.event.actor.ActorPacket.RoomError.Builder.class);
+    }
+
+    public static final int ROOM_ID_FIELD_NUMBER = 1;
+    private volatile java.lang.Object roomId_;
+    /**
+     * <code>string room_id = 1;</code>
+     */
+    public java.lang.String getRoomId() {
+      java.lang.Object ref = roomId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        roomId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string room_id = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getRoomIdBytes() {
+      java.lang.Object ref = roomId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        roomId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int GAME_ID_FIELD_NUMBER = 2;
+    private volatile java.lang.Object gameId_;
+    /**
+     * <code>string game_id = 2;</code>
+     */
+    public java.lang.String getGameId() {
+      java.lang.Object ref = gameId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        gameId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string game_id = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getGameIdBytes() {
+      java.lang.Object ref = gameId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        gameId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int CODE_FIELD_NUMBER = 3;
+    private int code_;
+    /**
+     * <code>uint32 code = 3;</code>
+     */
+    public int getCode() {
+      return code_;
+    }
+
+    public static final int MESSAGE_FIELD_NUMBER = 4;
+    private volatile java.lang.Object message_;
+    /**
+     * <code>string message = 4;</code>
+     */
+    public java.lang.String getMessage() {
+      java.lang.Object ref = message_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        message_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string message = 4;</code>
+     */
+    public com.google.protobuf.ByteString
+        getMessageBytes() {
+      java.lang.Object ref = message_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        message_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!getRoomIdBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, roomId_);
+      }
+      if (!getGameIdBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, gameId_);
+      }
+      if (code_ != 0) {
+        output.writeUInt32(3, code_);
+      }
+      if (!getMessageBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, message_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!getRoomIdBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, roomId_);
+      }
+      if (!getGameIdBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, gameId_);
+      }
+      if (code_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(3, code_);
+      }
+      if (!getMessageBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, message_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof dangnguyendota.event.actor.ActorPacket.RoomError)) {
+        return super.equals(obj);
+      }
+      dangnguyendota.event.actor.ActorPacket.RoomError other = (dangnguyendota.event.actor.ActorPacket.RoomError) obj;
+
+      boolean result = true;
+      result = result && getRoomId()
+          .equals(other.getRoomId());
+      result = result && getGameId()
+          .equals(other.getGameId());
+      result = result && (getCode()
+          == other.getCode());
+      result = result && getMessage()
+          .equals(other.getMessage());
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + ROOM_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getRoomId().hashCode();
+      hash = (37 * hash) + GAME_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getGameId().hashCode();
+      hash = (37 * hash) + CODE_FIELD_NUMBER;
+      hash = (53 * hash) + getCode();
+      hash = (37 * hash) + MESSAGE_FIELD_NUMBER;
+      hash = (53 * hash) + getMessage().hashCode();
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static dangnguyendota.event.actor.ActorPacket.RoomError parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static dangnguyendota.event.actor.ActorPacket.RoomError parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static dangnguyendota.event.actor.ActorPacket.RoomError parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static dangnguyendota.event.actor.ActorPacket.RoomError parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static dangnguyendota.event.actor.ActorPacket.RoomError parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static dangnguyendota.event.actor.ActorPacket.RoomError parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static dangnguyendota.event.actor.ActorPacket.RoomError parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static dangnguyendota.event.actor.ActorPacket.RoomError parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static dangnguyendota.event.actor.ActorPacket.RoomError parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static dangnguyendota.event.actor.ActorPacket.RoomError parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static dangnguyendota.event.actor.ActorPacket.RoomError parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static dangnguyendota.event.actor.ActorPacket.RoomError parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(dangnguyendota.event.actor.ActorPacket.RoomError prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code event.actor.RoomError}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:event.actor.RoomError)
+        dangnguyendota.event.actor.ActorPacket.RoomErrorOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return dangnguyendota.event.actor.ActorPacket.internal_static_event_actor_RoomError_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return dangnguyendota.event.actor.ActorPacket.internal_static_event_actor_RoomError_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                dangnguyendota.event.actor.ActorPacket.RoomError.class, dangnguyendota.event.actor.ActorPacket.RoomError.Builder.class);
+      }
+
+      // Construct using dangnguyendota.event.actor.ActorPacket.RoomError.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        roomId_ = "";
+
+        gameId_ = "";
+
+        code_ = 0;
+
+        message_ = "";
+
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return dangnguyendota.event.actor.ActorPacket.internal_static_event_actor_RoomError_descriptor;
+      }
+
+      @java.lang.Override
+      public dangnguyendota.event.actor.ActorPacket.RoomError getDefaultInstanceForType() {
+        return dangnguyendota.event.actor.ActorPacket.RoomError.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public dangnguyendota.event.actor.ActorPacket.RoomError build() {
+        dangnguyendota.event.actor.ActorPacket.RoomError result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public dangnguyendota.event.actor.ActorPacket.RoomError buildPartial() {
+        dangnguyendota.event.actor.ActorPacket.RoomError result = new dangnguyendota.event.actor.ActorPacket.RoomError(this);
+        result.roomId_ = roomId_;
+        result.gameId_ = gameId_;
+        result.code_ = code_;
+        result.message_ = message_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof dangnguyendota.event.actor.ActorPacket.RoomError) {
+          return mergeFrom((dangnguyendota.event.actor.ActorPacket.RoomError)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(dangnguyendota.event.actor.ActorPacket.RoomError other) {
+        if (other == dangnguyendota.event.actor.ActorPacket.RoomError.getDefaultInstance()) return this;
+        if (!other.getRoomId().isEmpty()) {
+          roomId_ = other.roomId_;
+          onChanged();
+        }
+        if (!other.getGameId().isEmpty()) {
+          gameId_ = other.gameId_;
+          onChanged();
+        }
+        if (other.getCode() != 0) {
+          setCode(other.getCode());
+        }
+        if (!other.getMessage().isEmpty()) {
+          message_ = other.message_;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        dangnguyendota.event.actor.ActorPacket.RoomError parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (dangnguyendota.event.actor.ActorPacket.RoomError) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private java.lang.Object roomId_ = "";
+      /**
+       * <code>string room_id = 1;</code>
+       */
+      public java.lang.String getRoomId() {
+        java.lang.Object ref = roomId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          roomId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string room_id = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getRoomIdBytes() {
+        java.lang.Object ref = roomId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          roomId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string room_id = 1;</code>
+       */
+      public Builder setRoomId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        roomId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string room_id = 1;</code>
+       */
+      public Builder clearRoomId() {
+        
+        roomId_ = getDefaultInstance().getRoomId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string room_id = 1;</code>
+       */
+      public Builder setRoomIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        roomId_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object gameId_ = "";
+      /**
+       * <code>string game_id = 2;</code>
+       */
+      public java.lang.String getGameId() {
+        java.lang.Object ref = gameId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          gameId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string game_id = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getGameIdBytes() {
+        java.lang.Object ref = gameId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          gameId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string game_id = 2;</code>
+       */
+      public Builder setGameId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        gameId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string game_id = 2;</code>
+       */
+      public Builder clearGameId() {
+        
+        gameId_ = getDefaultInstance().getGameId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string game_id = 2;</code>
+       */
+      public Builder setGameIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        gameId_ = value;
+        onChanged();
+        return this;
+      }
+
+      private int code_ ;
+      /**
+       * <code>uint32 code = 3;</code>
+       */
+      public int getCode() {
+        return code_;
+      }
+      /**
+       * <code>uint32 code = 3;</code>
+       */
+      public Builder setCode(int value) {
+        
+        code_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>uint32 code = 3;</code>
+       */
+      public Builder clearCode() {
+        
+        code_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object message_ = "";
+      /**
+       * <code>string message = 4;</code>
+       */
+      public java.lang.String getMessage() {
+        java.lang.Object ref = message_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          message_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string message = 4;</code>
+       */
+      public com.google.protobuf.ByteString
+          getMessageBytes() {
+        java.lang.Object ref = message_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          message_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string message = 4;</code>
+       */
+      public Builder setMessage(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        message_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string message = 4;</code>
+       */
+      public Builder clearMessage() {
+        
+        message_ = getDefaultInstance().getMessage();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string message = 4;</code>
+       */
+      public Builder setMessageBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        message_ = value;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFieldsProto3(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:event.actor.RoomError)
+    }
+
+    // @@protoc_insertion_point(class_scope:event.actor.RoomError)
+    private static final dangnguyendota.event.actor.ActorPacket.RoomError DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new dangnguyendota.event.actor.ActorPacket.RoomError();
+    }
+
+    public static dangnguyendota.event.actor.ActorPacket.RoomError getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<RoomError>
+        PARSER = new com.google.protobuf.AbstractParser<RoomError>() {
+      @java.lang.Override
+      public RoomError parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new RoomError(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<RoomError> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<RoomError> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public dangnguyendota.event.actor.ActorPacket.RoomError getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -16301,6 +17405,11 @@ public final class ActorPacket {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_event_actor_Error_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_event_actor_RoomError_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_event_actor_RoomError_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_event_actor_Presence_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -16379,53 +17488,56 @@ public final class ActorPacket {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\021actor_event.proto\022\013event.actor\"\206\005\n\006Pac" +
+      "\n\021actor_event.proto\022\013event.actor\"\265\005\n\006Pac" +
       "ket\022\021\n\tpacket_id\030\001 \001(\t\022#\n\005error\030\002 \001(\0132\022." +
-      "event.actor.ErrorH\000\022.\n\013create_room\030\003 \001(\013" +
-      "2\027.event.actor.CreateRoomH\000\022*\n\tjoin_room" +
-      "\030\004 \001(\0132\025.event.actor.JoinRoomH\000\022,\n\nleave" +
-      "_room\030\005 \001(\0132\026.event.actor.LeaveRoomH\000\022!\n" +
-      "\004room\030\006 \001(\0132\021.event.actor.RoomH\000\022)\n\010pres" +
-      "ence\030\007 \001(\0132\025.event.actor.PresenceH\000\022,\n\nj" +
-      "oin_leave\030\010 \001(\0132\026.event.actor.JoinLeaveH" +
-      "\000\022*\n\tdata_send\030\t \001(\0132\025.event.actor.DataS" +
-      "endH\000\0220\n\014room_message\030\n \001(\0132\030.event.acto" +
-      "r.RoomMessageH\000\022*\n\tview_room\030\013 \001(\0132\025.eve" +
-      "nt.actor.ViewRoomH\000\0221\n\010messages\030\014 \001(\0132\035." +
-      "event.actor.RealtimeMessagesH\000\022F\n\030player" +
-      "_preparing_to_join\030\r \001(\0132\".event.actor.P" +
-      "layerPreparingToJoinH\000\022.\n\013closed_room\030\016 " +
-      "\001(\0132\027.event.actor.ClosedRoomH\000B\t\n\007messag" +
-      "e\"&\n\005Error\022\014\n\004code\030\001 \001(\r\022\017\n\007message\030\002 \001(" +
-      "\t\"<\n\010Presence\022\n\n\002id\030\001 \001(\t\022\024\n\014display_nam" +
-      "e\030\003 \001(\t\022\016\n\006avatar\030\004 \001(\t\"\361\001\n\004Room\022\017\n\007room" +
-      "_id\030\001 \001(\t\022\017\n\007game_id\030\002 \001(\t\022&\n\007players\030\003 " +
-      "\003(\0132\025.event.actor.Presence\022&\n\007viewers\030\004 " +
-      "\003(\0132\025.event.actor.Presence\0221\n\010metadata\030\005" +
-      " \003(\0132\037.event.actor.Room.MetadataEntry\022\023\n" +
-      "\013create_time\030\006 \001(\003\032/\n\rMetadataEntry\022\013\n\003k" +
-      "ey\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"\035\n\nCreateRoo" +
-      "m\022\017\n\007game_id\030\001 \001(\t\"-\n\tLeaveRoom\022\017\n\007room_" +
-      "id\030\001 \001(\t\022\017\n\007game_id\030\002 \001(\t\",\n\010JoinRoom\022\017\n" +
-      "\007room_id\030\001 \001(\t\022\017\n\007game_id\030\002 \001(\t\",\n\010ViewR" +
-      "oom\022\017\n\007room_id\030\001 \001(\t\022\017\n\007game_id\030\002 \001(\t\"i\n" +
-      "\tJoinLeave\022\017\n\007room_id\030\001 \001(\t\022$\n\005joins\030\002 \003" +
-      "(\0132\025.event.actor.Presence\022%\n\006leaves\030\003 \003(" +
-      "\0132\025.event.actor.Presence\"a\n\010DataSend\022\017\n\007" +
-      "room_id\030\001 \001(\t\022\014\n\004data\030\002 \001(\014\022\n\n\002to\030\003 \003(\t\022" +
-      "\014\n\004code\030\004 \001(\003\022\017\n\007game_id\030\005 \001(\t\022\013\n\003sid\030\006 " +
-      "\001(\t\"K\n\013RoomMessage\022\017\n\007game_id\030\001 \001(\t\022\017\n\007r" +
-      "oom_id\030\002 \001(\t\022\014\n\004data\030\003 \001(\014\022\014\n\004time\030\004 \001(\003" +
-      "\"I\n\017RealtimeMessage\022\023\n\013presence_id\030\001 \001(\t" +
-      "\022\014\n\004data\030\002 \001(\014\022\023\n\013create_time\030\003 \001(\003\"d\n\020R" +
-      "ealtimeMessages\022\017\n\007game_id\030\001 \001(\t\022\017\n\007room" +
-      "_id\030\002 \001(\t\022.\n\010messages\030\003 \003(\0132\034.event.acto" +
-      "r.RealtimeMessage\"b\n\025PlayerPreparingToJo" +
-      "in\022\017\n\007game_id\030\001 \001(\t\022\017\n\007room_id\030\002 \001(\t\022\'\n\010" +
-      "presence\030\003 \001(\0132\025.event.actor.Presence\".\n" +
-      "\nClosedRoom\022\017\n\007game_id\030\001 \001(\t\022\017\n\007room_id\030" +
-      "\002 \001(\tB7\n\032dangnguyendota.event.actorB\013Act" +
-      "orPacketZ\014.;eventactorb\006proto3"
+      "event.actor.ErrorH\000\022-\n\nroom_error\030\311\001 \001(\013" +
+      "2\026.event.actor.RoomErrorH\000\022.\n\013create_roo" +
+      "m\030\003 \001(\0132\027.event.actor.CreateRoomH\000\022*\n\tjo" +
+      "in_room\030\004 \001(\0132\025.event.actor.JoinRoomH\000\022," +
+      "\n\nleave_room\030\005 \001(\0132\026.event.actor.LeaveRo" +
+      "omH\000\022!\n\004room\030\006 \001(\0132\021.event.actor.RoomH\000\022" +
+      ")\n\010presence\030\007 \001(\0132\025.event.actor.Presence" +
+      "H\000\022,\n\njoin_leave\030\010 \001(\0132\026.event.actor.Joi" +
+      "nLeaveH\000\022*\n\tdata_send\030\t \001(\0132\025.event.acto" +
+      "r.DataSendH\000\0220\n\014room_message\030\n \001(\0132\030.eve" +
+      "nt.actor.RoomMessageH\000\022*\n\tview_room\030\013 \001(" +
+      "\0132\025.event.actor.ViewRoomH\000\0221\n\010messages\030\014" +
+      " \001(\0132\035.event.actor.RealtimeMessagesH\000\022F\n" +
+      "\030player_preparing_to_join\030\r \001(\0132\".event." +
+      "actor.PlayerPreparingToJoinH\000\022.\n\013closed_" +
+      "room\030\016 \001(\0132\027.event.actor.ClosedRoomH\000B\t\n" +
+      "\007message\"&\n\005Error\022\014\n\004code\030\001 \001(\r\022\017\n\007messa" +
+      "ge\030\002 \001(\t\"L\n\tRoomError\022\017\n\007room_id\030\001 \001(\t\022\017" +
+      "\n\007game_id\030\002 \001(\t\022\014\n\004code\030\003 \001(\r\022\017\n\007message" +
+      "\030\004 \001(\t\"<\n\010Presence\022\n\n\002id\030\001 \001(\t\022\024\n\014displa" +
+      "y_name\030\003 \001(\t\022\016\n\006avatar\030\004 \001(\t\"\361\001\n\004Room\022\017\n" +
+      "\007room_id\030\001 \001(\t\022\017\n\007game_id\030\002 \001(\t\022&\n\007playe" +
+      "rs\030\003 \003(\0132\025.event.actor.Presence\022&\n\007viewe" +
+      "rs\030\004 \003(\0132\025.event.actor.Presence\0221\n\010metad" +
+      "ata\030\005 \003(\0132\037.event.actor.Room.MetadataEnt" +
+      "ry\022\023\n\013create_time\030\006 \001(\003\032/\n\rMetadataEntry" +
+      "\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"\035\n\nCrea" +
+      "teRoom\022\017\n\007game_id\030\001 \001(\t\"-\n\tLeaveRoom\022\017\n\007" +
+      "room_id\030\001 \001(\t\022\017\n\007game_id\030\002 \001(\t\",\n\010JoinRo" +
+      "om\022\017\n\007room_id\030\001 \001(\t\022\017\n\007game_id\030\002 \001(\t\",\n\010" +
+      "ViewRoom\022\017\n\007room_id\030\001 \001(\t\022\017\n\007game_id\030\002 \001" +
+      "(\t\"i\n\tJoinLeave\022\017\n\007room_id\030\001 \001(\t\022$\n\005join" +
+      "s\030\002 \003(\0132\025.event.actor.Presence\022%\n\006leaves" +
+      "\030\003 \003(\0132\025.event.actor.Presence\"a\n\010DataSen" +
+      "d\022\017\n\007room_id\030\001 \001(\t\022\014\n\004data\030\002 \001(\014\022\n\n\002to\030\003" +
+      " \003(\t\022\014\n\004code\030\004 \001(\003\022\017\n\007game_id\030\005 \001(\t\022\013\n\003s" +
+      "id\030\006 \001(\t\"K\n\013RoomMessage\022\017\n\007game_id\030\001 \001(\t" +
+      "\022\017\n\007room_id\030\002 \001(\t\022\014\n\004data\030\003 \001(\014\022\014\n\004time\030" +
+      "\004 \001(\003\"I\n\017RealtimeMessage\022\023\n\013presence_id\030" +
+      "\001 \001(\t\022\014\n\004data\030\002 \001(\014\022\023\n\013create_time\030\003 \001(\003" +
+      "\"d\n\020RealtimeMessages\022\017\n\007game_id\030\001 \001(\t\022\017\n" +
+      "\007room_id\030\002 \001(\t\022.\n\010messages\030\003 \003(\0132\034.event" +
+      ".actor.RealtimeMessage\"b\n\025PlayerPreparin" +
+      "gToJoin\022\017\n\007game_id\030\001 \001(\t\022\017\n\007room_id\030\002 \001(" +
+      "\t\022\'\n\010presence\030\003 \001(\0132\025.event.actor.Presen" +
+      "ce\".\n\nClosedRoom\022\017\n\007game_id\030\001 \001(\t\022\017\n\007roo" +
+      "m_id\030\002 \001(\tB7\n\032dangnguyendota.event.actor" +
+      "B\013ActorPacketZ\014.;eventactorb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -16444,21 +17556,27 @@ public final class ActorPacket {
     internal_static_event_actor_Packet_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_event_actor_Packet_descriptor,
-        new java.lang.String[] { "PacketId", "Error", "CreateRoom", "JoinRoom", "LeaveRoom", "Room", "Presence", "JoinLeave", "DataSend", "RoomMessage", "ViewRoom", "Messages", "PlayerPreparingToJoin", "ClosedRoom", "Message", });
+        new java.lang.String[] { "PacketId", "Error", "RoomError", "CreateRoom", "JoinRoom", "LeaveRoom", "Room", "Presence", "JoinLeave", "DataSend", "RoomMessage", "ViewRoom", "Messages", "PlayerPreparingToJoin", "ClosedRoom", "Message", });
     internal_static_event_actor_Error_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_event_actor_Error_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_event_actor_Error_descriptor,
         new java.lang.String[] { "Code", "Message", });
-    internal_static_event_actor_Presence_descriptor =
+    internal_static_event_actor_RoomError_descriptor =
       getDescriptor().getMessageTypes().get(2);
+    internal_static_event_actor_RoomError_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_event_actor_RoomError_descriptor,
+        new java.lang.String[] { "RoomId", "GameId", "Code", "Message", });
+    internal_static_event_actor_Presence_descriptor =
+      getDescriptor().getMessageTypes().get(3);
     internal_static_event_actor_Presence_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_event_actor_Presence_descriptor,
         new java.lang.String[] { "Id", "DisplayName", "Avatar", });
     internal_static_event_actor_Room_descriptor =
-      getDescriptor().getMessageTypes().get(3);
+      getDescriptor().getMessageTypes().get(4);
     internal_static_event_actor_Room_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_event_actor_Room_descriptor,
@@ -16470,67 +17588,67 @@ public final class ActorPacket {
         internal_static_event_actor_Room_MetadataEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
     internal_static_event_actor_CreateRoom_descriptor =
-      getDescriptor().getMessageTypes().get(4);
+      getDescriptor().getMessageTypes().get(5);
     internal_static_event_actor_CreateRoom_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_event_actor_CreateRoom_descriptor,
         new java.lang.String[] { "GameId", });
     internal_static_event_actor_LeaveRoom_descriptor =
-      getDescriptor().getMessageTypes().get(5);
+      getDescriptor().getMessageTypes().get(6);
     internal_static_event_actor_LeaveRoom_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_event_actor_LeaveRoom_descriptor,
         new java.lang.String[] { "RoomId", "GameId", });
     internal_static_event_actor_JoinRoom_descriptor =
-      getDescriptor().getMessageTypes().get(6);
+      getDescriptor().getMessageTypes().get(7);
     internal_static_event_actor_JoinRoom_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_event_actor_JoinRoom_descriptor,
         new java.lang.String[] { "RoomId", "GameId", });
     internal_static_event_actor_ViewRoom_descriptor =
-      getDescriptor().getMessageTypes().get(7);
+      getDescriptor().getMessageTypes().get(8);
     internal_static_event_actor_ViewRoom_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_event_actor_ViewRoom_descriptor,
         new java.lang.String[] { "RoomId", "GameId", });
     internal_static_event_actor_JoinLeave_descriptor =
-      getDescriptor().getMessageTypes().get(8);
+      getDescriptor().getMessageTypes().get(9);
     internal_static_event_actor_JoinLeave_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_event_actor_JoinLeave_descriptor,
         new java.lang.String[] { "RoomId", "Joins", "Leaves", });
     internal_static_event_actor_DataSend_descriptor =
-      getDescriptor().getMessageTypes().get(9);
+      getDescriptor().getMessageTypes().get(10);
     internal_static_event_actor_DataSend_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_event_actor_DataSend_descriptor,
         new java.lang.String[] { "RoomId", "Data", "To", "Code", "GameId", "Sid", });
     internal_static_event_actor_RoomMessage_descriptor =
-      getDescriptor().getMessageTypes().get(10);
+      getDescriptor().getMessageTypes().get(11);
     internal_static_event_actor_RoomMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_event_actor_RoomMessage_descriptor,
         new java.lang.String[] { "GameId", "RoomId", "Data", "Time", });
     internal_static_event_actor_RealtimeMessage_descriptor =
-      getDescriptor().getMessageTypes().get(11);
+      getDescriptor().getMessageTypes().get(12);
     internal_static_event_actor_RealtimeMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_event_actor_RealtimeMessage_descriptor,
         new java.lang.String[] { "PresenceId", "Data", "CreateTime", });
     internal_static_event_actor_RealtimeMessages_descriptor =
-      getDescriptor().getMessageTypes().get(12);
+      getDescriptor().getMessageTypes().get(13);
     internal_static_event_actor_RealtimeMessages_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_event_actor_RealtimeMessages_descriptor,
         new java.lang.String[] { "GameId", "RoomId", "Messages", });
     internal_static_event_actor_PlayerPreparingToJoin_descriptor =
-      getDescriptor().getMessageTypes().get(13);
+      getDescriptor().getMessageTypes().get(14);
     internal_static_event_actor_PlayerPreparingToJoin_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_event_actor_PlayerPreparingToJoin_descriptor,
         new java.lang.String[] { "GameId", "RoomId", "Presence", });
     internal_static_event_actor_ClosedRoom_descriptor =
-      getDescriptor().getMessageTypes().get(14);
+      getDescriptor().getMessageTypes().get(15);
     internal_static_event_actor_ClosedRoom_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_event_actor_ClosedRoom_descriptor,

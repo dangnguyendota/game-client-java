@@ -1,50 +1,30 @@
 package com.gmail.dangnguyendota.client;
 
-import com.google.api.client.http.GenericUrl;
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestFactory;
-import com.google.api.client.http.HttpResponse;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.protobuf.ByteString;
 import com.neovisionaries.ws.client.*;
 import dangnguyendota.event.actor.ActorPacket;
 import dangnguyendota.event.stage.StagePacket;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-
 import javax.annotation.Nonnull;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Client implements Session {
-    private final Config config;
-    private final HttpRequestFactory client;
-    private PlayerInfo info;
     private SessionListener listener;
     private WebSocket stageWs;
     private WebSocket actorWs;
     private final PacketManager packetManager;
     private final ExecutorService queue;
+    private final String socketAddr, token;
 
-    public Client(Config config) {
-        this.config = config;
-        HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
-        this.client = HTTP_TRANSPORT.createRequestFactory();
+    public Client(String socketAddr, String token) {
         packetManager = new PacketManager();
         queue = Executors.newSingleThreadExecutor();
-
+        this.socketAddr = socketAddr;
+        this.token = token;
     }
 
     @Override
@@ -52,150 +32,16 @@ public class Client implements Session {
         this.listener = listener;
     }
 
-
-    @Override
-    public JsonObject post(@Nonnull String path, @Nonnull List<NameValuePair> params) throws IOException {
-        GenericUrl url = new GenericUrl(path);
-        for (NameValuePair pair : params) {
-            url.set(pair.getName(), pair.getValue());
-        }
-        HttpRequest httpRequest = this.client.buildPostRequest(url, null);
-        HttpResponse response = httpRequest.execute();
-        try (InputStream stream = response.getContent()) {
-            InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
-            JsonObject res = JsonParser.parseReader(reader).getAsJsonObject();
-            if (response.getStatusCode() == HttpStatus.SC_NOT_FOUND) {
-                this.listener.onHttpError(res.get("code").getAsInt(), res.get("error").getAsString());
-            } else if (response.getStatusCode() == HttpStatus.SC_OK) {
-                return res.get("response").getAsJsonObject();
-            }
-        }
-
-        return null;
-    }
-
-    @Override
-    public UUID id() {
-        if (info == null) {
-            return null;
-        }
-        return info.id;
-    }
-
-    @Override
-    public String username() {
-        if (info == null) {
-            return null;
-        }
-        return info.username;
-    }
-
-    @Override
-    public String displayName() {
-        if (info == null) {
-            return null;
-        }
-        return info.displayName;
-    }
-
-    @Override
-    public String avatarCode() {
-        if (info == null) {
-            return null;
-        }
-        return info.avatar;
-    }
-
-    @Override
-    public Object attribute(String key) {
-        if (info == null) {
-            return null;
-        }
-        return info.attributes.get(key);
-    }
-
     @Override
     public String authToken() {
-        if (info == null) {
-            return null;
-        }
-        return info.token;
-    }
-
-    @Override
-    public Date authExpiredTime() {
-        if (info == null) {
-            return null;
-        }
-        return info.tokenExpiredTime;
-    }
-
-    @Override
-    public Boolean authIsExpired() {
-        if (info == null) {
-            return null;
-        }
-        return Objects.requireNonNull(this.authExpiredTime()).getTime() - new Date().getTime() < 0L;
-    }
-
-    @Override
-    public Date createTime() {
-        if (info == null) {
-            return null;
-        }
-        return info.createdAt;
-    }
-
-    @Override
-    public Date updateTime() {
-        return info.updatedAt;
-    }
-
-    @Override
-    public ListenableFuture<Boolean> login(@Nonnull String username, @Nonnull String password) {
-        try {
-            List<NameValuePair> params = new ArrayList<>(2);
-            params.add(new BasicNameValuePair("username", username));
-            params.add(new BasicNameValuePair("password", password));
-            JsonObject object = this.post(config.loginPath(), params);
-            if (object != null) {
-                info = new PlayerInfo();
-                info.id = UUID.fromString(object.get("id").getAsString());
-                info.username = object.get("username").getAsString();
-                info.displayName = object.get("display_name").getAsString();
-                info.avatar = object.get("avatar").getAsString();
-                info.createdAt = new Date(object.get("created_at").getAsLong() * 1000L);
-                info.updatedAt = new Date(object.get("updated_at").getAsLong() * 1000L);
-                info.token = object.get("token").getAsString();
-                info.tokenExpiredTime = new Date(object.get("expired").getAsLong() * 1000L);
-                return Futures.immediateFuture(true);
-            }
-        } catch (Exception e) {
-            listener.onException(e);
-        }
-        return Futures.immediateFuture(false);
-    }
-
-    @Override
-    public ListenableFuture<Boolean> register(@Nonnull String username, @Nonnull String password, @Nonnull String displayName) {
-        try {
-            List<NameValuePair> params = new ArrayList<>();
-            params.add(new BasicNameValuePair("username", username));
-            params.add(new BasicNameValuePair("password", password));
-            params.add(new BasicNameValuePair("display_name", displayName));
-            JsonObject object = this.post(config.registerPath(), params);
-            return Futures.immediateFuture(object != null);
-        } catch (Exception e) {
-            listener.onException(e);
-        }
-        return Futures.immediateFuture(false);
+        return token;
     }
 
     @Override
     public ListenableFuture<Boolean> connectStage() {
         try {
             WebSocketFactory factory = new WebSocketFactory().setConnectionTimeout(5000);
-            stageWs = factory.createSocket(this.config.gameServerPath(this.info.token));
+            stageWs = factory.createSocket(socketAddr + "?token=" + token);
             WebSocketAdapter adapter = new WebSocketAdapter() {
                 @Override
                 public void onBinaryMessage(WebSocket websocket, byte[] binary) {
@@ -330,7 +176,7 @@ public class Client implements Session {
                 // server message
                 queue.execute(() -> {
                     if (packet.hasError()) {
-                        listener.onStageError(new Error(packet.getError()));
+                        listener.onStageError(packet.getError().getCode(), packet.getError().getMessage());
                     } else {
                         if (packet.hasActor()) {
                             Actor actor = new Actor(packet.getActor());
@@ -370,12 +216,12 @@ public class Client implements Session {
                     ActorPacket.RealtimeMessages messages = packet.getMessages();
                     List<ActorPacket.RealtimeMessage> list = messages.getMessagesList();
                     for (ActorPacket.RealtimeMessage message : list) {
-                        listener.onRelayedMessaged(messages.getGameId(), messages.getRoomId(), message.getPresenceId(),
+                        listener.onRelayedMessage(messages.getGameId(), messages.getRoomId(), message.getPresenceId(),
                                 message.getData().toByteArray(), message.getCreateTime());
                     }
                 } else if (packet.hasRoomMessage()) {
                     ActorPacket.RoomMessage roomMessage = packet.getRoomMessage();
-                    listener.onRoomMessaged(roomMessage.getGameId(), roomMessage.getRoomId(), roomMessage.getData().toByteArray(), roomMessage.getTime());
+                    listener.onRoomMessage(roomMessage.getGameId(), roomMessage.getRoomId(), roomMessage.getData().toByteArray(), roomMessage.getTime());
                 } else if (packet.hasJoinLeave()) {
                     ActorPacket.JoinLeave joinLeave = packet.getJoinLeave();
                     if (joinLeave.getJoinsList() != null) {
@@ -393,7 +239,10 @@ public class Client implements Session {
                 } else if (packet.hasClosedRoom()) {
                     listener.onRoomClosed(packet.getClosedRoom().getGameId(), packet.getClosedRoom().getRoomId());
                 } else if (packet.hasError()) {
-                    listener.onActorError(new Error(packet.getError()));
+                    listener.onActorError(packet.getError().getCode(), packet.getError().getMessage());
+                } else if (packet.hasRoomError()) {
+                    ActorPacket.RoomError error = packet.getRoomError();
+                    listener.onRoomError(error.getGameId(), error.getRoomId(), error.getCode(), error.getMessage());
                 }
             });
         } catch (Exception e) {
