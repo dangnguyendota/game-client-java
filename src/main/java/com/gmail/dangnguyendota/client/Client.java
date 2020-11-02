@@ -139,6 +139,21 @@ public class Client implements Session {
     }
 
     @Override
+    public ListenableFuture<Boolean> leaveRoom(@Nonnull String gameId, @Nonnull UUID roomId) {
+        if (actorWs == null || !actorWs.isOpen()) {
+            return Futures.immediateFuture(false);
+        }
+        ActorPacket.LeaveRoom leaveRoom = ActorPacket.LeaveRoom.newBuilder().
+                setRoomId(roomId.toString()).setGameId(gameId).build();
+        String id = UUID.randomUUID().toString();
+        ActorPacket.Packet packet = ActorPacket.Packet.newBuilder().setLeaveRoom(leaveRoom).setPacketId(id).build();
+        SettableFuture<Boolean> future = SettableFuture.create();
+        this.packetManager.set(id, future);
+        actorWs.sendBinary(packet.toByteArray());
+        return future;
+    }
+
+    @Override
     public void sendRoomData(@Nonnull String gameId, @Nonnull String roomId, @Nonnull byte[] data) {
         if (actorWs == null || !actorWs.isOpen()) {
             listener.onException(new Exception("actor is not connected"));
@@ -211,40 +226,55 @@ public class Client implements Session {
     private void onActorBinaryMessage(byte[] binary) {
         try {
             final ActorPacket.Packet packet = ActorPacket.Packet.parseFrom(binary);
-            queue.execute(() -> {
-                if (packet.hasMessages()) {
-                    ActorPacket.RealtimeMessages messages = packet.getMessages();
-                    List<ActorPacket.RealtimeMessage> list = messages.getMessagesList();
-                    for (ActorPacket.RealtimeMessage message : list) {
-                        listener.onRelayedMessage(messages.getGameId(), messages.getRoomId(), message.getPresenceId(),
-                                message.getData().toByteArray(), message.getCreateTime());
-                    }
-                } else if (packet.hasRoomMessage()) {
-                    ActorPacket.RoomMessage roomMessage = packet.getRoomMessage();
-                    listener.onRoomMessage(roomMessage.getGameId(), roomMessage.getRoomId(), roomMessage.getData().toByteArray(), roomMessage.getTime());
-                } else if (packet.hasJoinLeave()) {
-                    ActorPacket.JoinLeave joinLeave = packet.getJoinLeave();
-                    if (joinLeave.getJoinsList() != null) {
-                        // joined actor room
-                        for (ActorPacket.Presence presence : joinLeave.getJoinsList()) {
-                            listener.playerJoined(presence.getId(), presence.getDisplayName(), presence.getAvatar());
+            if (packet.getPacketId() == null || "".equals(packet.getPacketId())) {
+                queue.execute(() -> {
+                    if (packet.hasMessages()) {
+                        ActorPacket.RealtimeMessages messages = packet.getMessages();
+                        List<ActorPacket.RealtimeMessage> list = messages.getMessagesList();
+                        for (ActorPacket.RealtimeMessage message : list) {
+                            listener.onRelayedMessage(messages.getGameId(), messages.getRoomId(), message.getPresenceId(),
+                                    message.getData().toByteArray(), message.getCreateTime());
                         }
-                    }
-                    if (joinLeave.getLeavesList() != null) {
-                        // left actor room
-                        for (ActorPacket.Presence presence : joinLeave.getLeavesList()) {
-                            listener.playerLeft(presence.getId(), presence.getDisplayName(), presence.getAvatar());
+                    } else if (packet.hasRoomMessage()) {
+                        ActorPacket.RoomMessage roomMessage = packet.getRoomMessage();
+                        listener.onRoomMessage(roomMessage.getGameId(), roomMessage.getRoomId(), roomMessage.getData().toByteArray(), roomMessage.getTime());
+                    } else if (packet.hasJoinLeave()) {
+                        ActorPacket.JoinLeave joinLeave = packet.getJoinLeave();
+                        if (joinLeave.getJoinsList() != null) {
+                            // joined actor room
+                            for (ActorPacket.Presence presence : joinLeave.getJoinsList()) {
+                                listener.playerJoined(presence.getId(), presence.getDisplayName(), presence.getAvatar());
+                            }
                         }
+                        if (joinLeave.getLeavesList() != null) {
+                            // left actor room
+                            for (ActorPacket.Presence presence : joinLeave.getLeavesList()) {
+                                listener.playerLeft(presence.getId(), presence.getDisplayName(), presence.getAvatar());
+                            }
+                        }
+                    } else if (packet.hasClosedRoom()) {
+                        listener.onRoomClosed(packet.getClosedRoom().getGameId(), packet.getClosedRoom().getRoomId());
+                    } else if (packet.hasError()) {
+                        listener.onActorError(packet.getError().getCode(), packet.getError().getMessage());
+                    } else if (packet.hasRoomError()) {
+                        ActorPacket.RoomError error = packet.getRoomError();
+                        listener.onRoomError(error.getGameId(), error.getRoomId(), error.getCode(), error.getMessage());
                     }
-                } else if (packet.hasClosedRoom()) {
-                    listener.onRoomClosed(packet.getClosedRoom().getGameId(), packet.getClosedRoom().getRoomId());
-                } else if (packet.hasError()) {
-                    listener.onActorError(packet.getError().getCode(), packet.getError().getMessage());
-                } else if (packet.hasRoomError()) {
-                    ActorPacket.RoomError error = packet.getRoomError();
-                    listener.onRoomError(error.getGameId(), error.getRoomId(), error.getCode(), error.getMessage());
+                });
+            } else {
+                // server response
+                final SettableFuture future = packetManager.remove(packet.getPacketId());
+                if (future == null) {
+                    return;
                 }
-            });
+
+                if (packet.hasError()) {
+                    listener.onActorError(packet.getError().getCode(), packet.getError().getMessage());
+                    future.set(false);
+                } else {
+                    future.set(true);
+                }
+            }
         } catch (Exception e) {
             this.listener.onException(e);
         }
