@@ -1,6 +1,8 @@
 package com.gmail.dangnguyendota.client;
 
-import java.util.Date;
+import com.gmail.dangnguyendota.event.stage.StagePacket;
+
+import java.util.List;
 
 public interface SessionListener {
     // đã kết nối tới stage server
@@ -44,6 +46,12 @@ public interface SessionListener {
      */
     void onException(final Exception e);
 
+    void onStageData(final StagePacket.UserConfig config);
+
+    void onSearchResult(final boolean ok);
+
+    void onCancelResult(final boolean ok);
+
     /**
      * sau khi gửi request lên stage server, stage server sẽ gửi yêu cầu tạo phòng sang cho registrator.
      * sau đó registrator sẽ tìm một actor server phù hợp để gửi yêu cầu tạo phòng. Tạo phòng xong thì gửi trả lại
@@ -52,10 +60,9 @@ public interface SessionListener {
      * @param gameId game id mà người chơi lựa chọn.
      * @param roomId id của phòng chơi.
      * @param address địa chỉ máy chủ actor .
-     * @param createTime thời gian khởi tạo phòng.
-     * @see dangnguyendota.event.actor.StagePacket.Actor
+     * @see com.gmail.dangnguyendota.event.stage.StagePacket.Room
      */
-    void onJoinedRoom(final String serviceId, final String gameId, final String roomId, final String address, final Date createTime);
+    void onCreatedRoom(final String serviceId, final String gameId, final String roomId, final String address, final StagePacket.RoomState state, final List<String> players);
 
     /**
      * khi một người chơi đã tham gia phòng chơi thì sẽ tất cả người
@@ -64,7 +71,7 @@ public interface SessionListener {
      * @param id id của người chơi là UUID
      * @param name tên hiển thị của người chơi
      * @param avatar id của avatar của người chơi
-     * @see dangnguyendota.event.actor.ActorPacket.JoinLeave
+     * @see com.gmail.dangnguyendota.event.actor.ActorPacket.JoinLeave
      */
     void playerJoined(final String id, final String name, final String avatar);
 
@@ -75,7 +82,7 @@ public interface SessionListener {
      * @param id id của người chơi là UUID
      * @param name tên hiển thị của người chơi
      * @param avatar id của avatar của người chơi
-     * @see dangnguyendota.event.actor.ActorPacket.JoinLeave
+     * @see com.gmail.dangnguyendota.event.actor.ActorPacket.JoinLeave
      */
     void playerLeft(final String id, final String name, final String avatar);
 
@@ -88,7 +95,7 @@ public interface SessionListener {
      * @param roomId id của phòng đó.
      * @param data dữ liệu server gửi về.
      * @param time thời gian mà gói tin được gửi đi.
-     * @see dangnguyendota.event.actor.ActorPacket.RoomMessage
+     * @see com.gmail.dangnguyendota.event.actor.ActorPacket.RoomMessage
      */
     void onRoomMessage(final String gameId, final String roomId, final byte[] data, final long time);
 
@@ -102,7 +109,7 @@ public interface SessionListener {
      * @param senderId id của người gửi.
      * @param data dữ liệu người gửi đã gửi.
      * @param time thời gian gói tin được gửi đi.
-     * @see dangnguyendota.event.actor.ActorPacket.RealtimeMessages
+     * @see com.gmail.dangnguyendota.event.actor.ActorPacket.RealtimeMessages
      */
     void onRelayedMessage(final String gameId, final String roomId, final String senderId, final byte[] data, final long time);
 
@@ -110,7 +117,9 @@ public interface SessionListener {
      * khi phòng đang chơi bị đóng lại mà vẫn đang ở trong phòng thì sẽ nhận được request này.
      * @param gameId id của game đang chơi.
      * @param roomId id của phòng đang chơi.
-     * @see dangnguyendota.event.actor.ActorPacket.ClosedRoom
+     * @see com.gmail.dangnguyendota.event.actor.ActorPacket.ClosedRoom
      */
     void onRoomClosed(final String gameId, final String roomId);
+
+    void onKicked(final String gameId, final String roomId);
 }
